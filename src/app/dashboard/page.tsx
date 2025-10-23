@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
             <div className="flex items-center justify-between">
               <div>
@@ -68,21 +68,10 @@ export default async function DashboardPage() {
               <Calendar className="h-10 w-10 text-blue-500" />
             </div>
           </div>
-
-          <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Achievements
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-white">
-                  0
-                </p>
-              </div>
-              <Award className="h-10 w-10 text-yellow-500" />
-            </div>
-          </div>
         </div>
+
+
+        <Textarea className="w-full mt-4" placeholder="Enter you workout here..." />
 
         <div className="mt-8 rounded-lg bg-white p-8 shadow-sm dark:bg-zinc-800">
           <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">
@@ -96,7 +85,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <Textarea className="w-full mt-4" placeholder="Enter you workout here..." />
+        
       </div>
     </div>
   );
