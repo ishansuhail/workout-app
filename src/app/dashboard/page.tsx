@@ -1,4 +1,4 @@
-import { Textarea } from "@/components/ui/textarea";
+import { ChatInput } from "@/components/chat-input";
 import { currentUser } from "@clerk/nextjs/server";
 import { Dumbbell, TrendingUp, Calendar, Award } from "lucide-react";
 import Link from "next/link";
@@ -70,8 +70,10 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-
-        <Textarea className="w-full mt-4" placeholder="Enter you workout here..." />
+        <div className="mt-4">
+            <ChatInput />
+        </div>
+        
 
         <div className="mt-8 rounded-lg bg-white p-8 shadow-sm dark:bg-zinc-800">
           <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">
