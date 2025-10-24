@@ -1,14 +1,8 @@
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Dumbbell } from "lucide-react";
-import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 
-export default async function Home() {
-  // Redirect authenticated users to dashboard
-  const user = await currentUser();
-  if (user) {
-    redirect("/dashboard");
-  }
+export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
       <main className="flex flex-col items-center justify-center px-6 py-12 text-center">
@@ -24,18 +18,27 @@ export default async function Home() {
 
         <SignedOut>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
+            <SignUpButton mode="modal">
               <button className="flex h-14 items-center justify-center rounded-full bg-[#6c47ff] px-8 text-lg font-semibold text-white transition-all hover:bg-[#5536cc] hover:shadow-lg">
                 Get Started
               </button>
             </SignUpButton>
-            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+            <SignInButton mode="modal">
               <button className="flex h-14 items-center justify-center rounded-full border-2 border-zinc-400 px-8 text-lg font-semibold text-white transition-all hover:border-white hover:bg-zinc-800">
                 Sign In
               </button>
             </SignInButton>
           </div>
         </SignedOut>
+
+        <SignedIn>
+          <Link 
+            href="/dashboard"
+            className="flex h-14 items-center justify-center rounded-full bg-[#6c47ff] px-8 text-lg font-semibold text-white transition-all hover:bg-[#5536cc] hover:shadow-lg"
+          >
+            Go to Dashboard
+          </Link>
+        </SignedIn>
 
         <div className="mt-16 grid gap-8 sm:grid-cols-3">
           <div className="rounded-lg bg-zinc-800/50 p-6 backdrop-blur-sm">

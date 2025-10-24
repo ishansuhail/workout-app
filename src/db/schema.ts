@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, integer, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Users table (synced with Clerk)
@@ -25,6 +25,9 @@ export const workouts = pgTable("workouts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+
+export const weightUnitEnum = pgEnum("weight_unit", ["lb", "kg"]);
+
 // Exercises table - individual exercises within a workout
 export const exercises = pgTable("exercises", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -35,6 +38,7 @@ export const exercises = pgTable("exercises", {
   sets: integer("sets"),
   reps: integer("reps"),
   weight: integer("weight"), // in lbs or kg
+  weightUnit: weightUnitEnum("weight_unit").default("lb"),
   duration: integer("duration"), // in minutes (for cardio)
   distance: integer("distance"), // in miles/km (for running/cycling)
   caloriesBurned: integer("calories_burned"),

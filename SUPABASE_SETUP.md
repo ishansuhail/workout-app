@@ -234,3 +234,4 @@ export default async function MyPage() {
   return <div>{/* Your UI */}</div>;
 }
 ```
+

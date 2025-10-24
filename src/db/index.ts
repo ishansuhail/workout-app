@@ -14,3 +14,4 @@ export const db = drizzle(client, { schema });
 // Export schema for use in queries
 export { schema };
 
+
