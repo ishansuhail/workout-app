@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { aiClient } from "@/lib/llm";
+import { NewExercise, NewWorkout, Workout } from "@/db/schema";
 
 const SYSTEM = `
 You are an information extractor for workout entries.
@@ -48,20 +49,16 @@ export async function POST(request: Request) {
     });
 
     const raw = response.choices[0]?.message?.content || "{}";
-    console.log("📩 AI raw output_text:", raw);
+    // console.log("📩 AI raw output_text:", raw);
 
     // Guaranteed to match schema; still wrap in try/catch for safety
-    const parsed = JSON.parse(raw) as {
-      movement: string | null;
-      sets: number | null;
-      reps: number | null;
-      weight: number | null;
-      weightUnit: "lb" | "kg" | null;
-    };
+    const parsed = JSON.parse(raw) as NewExercise;
 
     if (parsed.weight != null && parsed.weightUnit == null) {
       parsed.weightUnit = "lb";
     }
+
+    console.log("📩 AI parsed output:", parsed);
 
     return NextResponse.json({
       success: true,
