@@ -5,28 +5,28 @@ import { NewExercise, NewWorkout, Workout } from "@/db/schema";
 const SYSTEM = `
 You are an information extractor for workout entries.
 Input: casual gym text like "4 by 10 bench 185", "bench press 3x5 @ 100kg", etc.
-Output: STRICT JSON with EXACT keys: movement, sets, reps, weight, weightUnit.
+Output: STRICT JSON with EXACT keys: exerciseName, sets, reps, weight, weightUnit.
 Rules:
 - If any field is missing/unknown, set it to null. If weight is present but unit is missing, set weightUnit to null (the caller may default it to "lb").
 - Normalize obvious movement names (e.g., "bench" -> "bench press"; "ohp" -> "overhead press").
 - No commentary. Return ONLY the JSON object.
 `;
 
-// JSON Schema for strict structured outputs
+// JSON Schema for strict structured outputs - aligned with NewExercise type
 const ExerciseSchema = {
   name: "Exercise",
   schema: {
     type: "object",
     additionalProperties: false,
     properties: {
-      movement: { type: ["string", "null"] },
+      exerciseName: { type: ["string", "null"] },
       sets: { type: ["integer", "null"], minimum: 1 },
       reps: { type: ["integer", "null"], minimum: 1 },
       weight: { type: ["number", "null"], minimum: 0 },
-      // allow null; we’ll default to "lb" downstream if it’s missing and weight exists
+      // allow null; we'll default to "lb" downstream if it's missing and weight exists
       weightUnit: { type: ["string", "null"], enum: ["lb", "kg", null] }
     },
-    required: ["movement", "sets", "reps", "weight", "weightUnit"]
+    required: ["exerciseName", "sets", "reps", "weight", "weightUnit"]
   },
   strict: true
 } as const;
