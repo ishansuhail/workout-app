@@ -3,10 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
+  const userId = user?.id;
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -14,7 +18,7 @@ export function ChatInput() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(`/api/chat/${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,13 +30,16 @@ export function ChatInput() {
 
       if (data.success) {
         console.log("✅ Message sent successfully:", data);
+        toast.success("Logged exercise successfully");
         // Clear the textarea after successful send
         setMessage("");
       } else {
         console.error("❌ Error:", data.error);
+        toast.error("Failed to log exercise");
       }
     } catch (error) {
       console.error("❌ Failed to send message:", error);
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setIsLoading(false);
     }

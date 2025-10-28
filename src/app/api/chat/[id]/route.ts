@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { aiClient } from "@/lib/llm";
 import { NewExercise, NewWorkout, Workout } from "@/db/schema";
+import { getWorkoutId } from "@/lib/getWorkoutid";
+import { createExercise, createWorkout } from "@/db/queries";
 
 const SYSTEM = `
 You are an information extractor for workout entries.
@@ -31,11 +33,16 @@ const ExerciseSchema = {
   strict: true
 } as const;
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id: userId } = await params;
     const body = await request.json();
     const { message } = body;
 
+    console.log("📨 User ID:", userId);
     console.log("📨 User message:", message);
 
     const response = await aiClient.chat.completions.create({
@@ -60,10 +67,44 @@ export async function POST(request: Request) {
 
     console.log("📩 AI parsed output:", parsed);
 
-    return NextResponse.json({
-      success: true,
-      data: parsed
-    });
+    if (parsed.exerciseName == null || parsed.sets == null || parsed.reps == null || parsed.weight == null) {
+      return NextResponse.json({
+        success: false,
+        error: "Invalid exercise data"
+      }, { status: 400 });
+    }
+    else {
+      try { 
+        const workoutId = getWorkoutId(userId, new Date());
+        // const [workout] = await createWorkout({
+        //   id: workoutId,
+        //   userId: userId,
+        //   date: new Date(),
+        //   title: "Workout",
+        //   notes: "Workout notes"
+        // });
+
+        // const [exercise] = await createExercise({
+        //   id: workoutId,
+        //   workoutId: workoutId,
+        //   exerciseName: parsed.exerciseName,
+        //   sets: parsed.sets,
+        //   reps: parsed.reps,
+        //   weight: parsed.weight,
+        //   weightUnit: parsed.weightUnit
+        // });
+        return NextResponse.json({
+          success: true,
+          data: "Exercise logged successfully"
+        }, { status: 200 });
+      } catch (error) {
+        console.error("Error in getting workout ID:", error);
+        return NextResponse.json({
+          success: false,
+          error: "Failed to log exercise. Please try again."
+        }, { status: 500 });
+      }
+    }
   } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(
