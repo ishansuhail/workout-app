@@ -6,9 +6,15 @@ import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const { user } = useUser();
   const userId = user?.id;
 
@@ -17,13 +23,19 @@ export function ChatInput() {
 
     setIsLoading(true);
 
+    // Add user message to history
+    const userMessage: Message = { role: "user", content: message };
+
     try {
       const response = await fetch(`/api/chat/${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ 
+          message,
+          history: messageHistory.slice(-10) // Send last 10 messages (5 back-and-forth exchanges)
+        }),
       });
 
       const data = await response.json();
@@ -31,6 +43,16 @@ export function ChatInput() {
       if (data.success) {
         console.log("✅ Message sent successfully:", data);
         toast.success("Logged exercise successfully");
+        
+        // Add assistant response to history
+        const assistantMessage: Message = { 
+          role: "assistant", 
+          content: data.aiResponse || "Exercise logged successfully" 
+        };
+        
+        // Update history with new messages, keep only last 10 (5 exchanges)
+        setMessageHistory(prev => [...prev, userMessage, assistantMessage].slice(-10));
+        
         // Clear the textarea after successful send
         setMessage("");
       } else {

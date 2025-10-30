@@ -33,6 +33,11 @@ const ExerciseSchema = {
   strict: true
 } as const;
 
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -40,18 +45,23 @@ export async function POST(
   try {
     const { id: userId } = await params;
     const body = await request.json();
-    const { message } = body;
+    const { message, history = [] } = body as { message: string; history?: Message[] };
 
     console.log("📨 User ID:", userId);
     console.log("📨 User message:", message);
+    console.log("📨 History length:", history.length);
+
+    // Build messages array with history
+    const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: SYSTEM },
+      ...history, // Include conversation history
+      { role: "user", content: message }
+    ];
 
     const response = await aiClient.chat.completions.create({
       model: "gpt-4o-mini", // or your preferred OpenAI model
       response_format: { type: "json_schema", json_schema: ExerciseSchema },
-      messages: [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: message }
-      ],
+      messages,
       temperature: 0.1
     });
 
@@ -95,7 +105,8 @@ export async function POST(
         // });
         return NextResponse.json({
           success: true,
-          data: "Exercise logged successfully"
+          data: parsed,
+          aiResponse: raw // Include the AI response for conversation history
         }, { status: 200 });
       } catch (error) {
         console.error("Error in getting workout ID:", error);
