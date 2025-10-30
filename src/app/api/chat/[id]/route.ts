@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { aiClient } from "@/lib/llm";
 import { NewExercise, NewWorkout, Workout } from "@/db/schema";
 import { getWorkoutId } from "@/lib/getWorkoutid";
-import { createExercise, createWorkout } from "@/db/queries";
+import { createExercise, getOrCreateWorkout, getUserByClerkId } from "@/db/queries";
 
 const SYSTEM = `
 You are an information extractor for workout entries.
@@ -77,32 +77,55 @@ export async function POST(
 
     console.log("📩 AI parsed output:", parsed);
 
-    if (parsed.exerciseName == null || parsed.sets == null || parsed.reps == null || parsed.weight == null) {
+    // Check for null fields and return them in the error
+    const nullFields: string[] = [];
+    if (parsed.exerciseName == null) nullFields.push("exerciseName");
+    if (parsed.sets == null) nullFields.push("sets");
+    if (parsed.reps == null) nullFields.push("reps");
+    if (parsed.weight == null) nullFields.push("weight");
+    
+    if (nullFields.length > 0) {
       return NextResponse.json({
         success: false,
-        error: "Invalid exercise data"
+        error: "Invalid exercise data",
+        missingFields: nullFields,
+        data: parsed
       }, { status: 400 });
     }
     else {
       try { 
+        // Get the user's internal database UUID from their Clerk ID
+        const user = await getUserByClerkId(userId);
+        
+        if (!user) {
+          return NextResponse.json({
+            success: false,
+            error: "User not found"
+          }, { status: 404 });
+        }
+        
         const workoutId = getWorkoutId(userId, new Date());
-        // const [workout] = await createWorkout({
-        //   id: workoutId,
-        //   userId: userId,
-        //   date: new Date(),
-        //   title: "Workout",
-        //   notes: "Workout notes"
-        // });
 
-        // const [exercise] = await createExercise({
-        //   id: workoutId,
-        //   workoutId: workoutId,
-        //   exerciseName: parsed.exerciseName,
-        //   sets: parsed.sets,
-        //   reps: parsed.reps,
-        //   weight: parsed.weight,
-        //   weightUnit: parsed.weightUnit
-        // });
+        // Get or create today's workout (won't error if it already exists)
+        await getOrCreateWorkout({
+          id: workoutId,
+          userId: user.id, // Use the internal UUID, not the Clerk ID
+          date: new Date(),
+          title: new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+          notes: null
+        });
+
+        // Add the exercise to the workout
+        await createExercise({
+          workoutId: workoutId,
+          exerciseName: parsed.exerciseName,
+          sets: parsed.sets,
+          reps: parsed.reps,
+          weight: parsed.weight,
+          weightUnit: parsed.weightUnit
+        });
+
+        
         return NextResponse.json({
           success: true,
           data: parsed,

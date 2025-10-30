@@ -38,6 +38,24 @@ export async function createWorkout(data: NewWorkout) {
   return db.insert(workouts).values(data).returning();
 }
 
+// Get or create workout - returns existing workout if it exists, creates new one if not
+export async function getOrCreateWorkout(data: NewWorkout) {
+  // First, try to get the workout by ID
+  const existing = await getWorkoutById(data.id!);
+  
+  if (existing) {
+    // Update the updatedAt timestamp
+    return db
+      .update(workouts)
+      .set({ updatedAt: new Date() })
+      .where(eq(workouts.id, data.id!))
+      .returning();
+  }
+  
+  // If it doesn't exist, create it
+  return db.insert(workouts).values(data).returning();
+}
+
 export async function updateWorkout(id: string, data: Partial<NewWorkout>) {
   return db.update(workouts).set(data).where(eq(workouts.id, id)).returning();
 }

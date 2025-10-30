@@ -56,8 +56,33 @@ export function ChatInput() {
         // Clear the textarea after successful send
         setMessage("");
       } else {
-        console.error("❌ Error:", data.error);
-        toast.error("Failed to log exercise");
+        console.error("❌ Error missing fields:", data.error);
+        
+        // Handle missing fields by prompting user
+        if (data.missingFields && data.missingFields.length > 0) {
+          const fieldNames = data.missingFields.map((field: string) => {
+            // Convert camelCase to readable format
+            return field.replace(/([A-Z])/g, ' $1').toLowerCase();
+          }).join(", ");
+          
+          // Create a helpful prompt message
+          const promptMessage = `Couldn't extract: ${fieldNames}. Please provide these details.`;
+          toast.error(promptMessage, { duration: 5000 });
+          
+          // Add assistant response with the prompt to history
+          const assistantMessage: Message = { 
+            role: "assistant", 
+            content: `Missing information: ${fieldNames}. Please provide these details.` 
+          };
+          
+          // Update history with new messages
+          setMessageHistory(prev => [...prev, userMessage, assistantMessage].slice(-10));
+          
+          // Keep the original message in the textarea so user can edit it
+          // Don't clear the message
+        } else {
+          toast.error("Failed to log exercise");
+        }
       }
     } catch (error) {
       console.error("❌ Failed to send message:", error);
