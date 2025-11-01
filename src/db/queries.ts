@@ -15,10 +15,11 @@ export async function createUser(data: NewUser) {
 }
 
 // Workout queries
-export async function getWorkoutsByUserId(userId: string) {
+export async function getWorkoutsByUserId(userId: string, limit?: number) {
   return db.query.workouts.findMany({
     where: eq(workouts.userId, userId),
     orderBy: [desc(workouts.date)],
+    limit: limit,
     with: {
       exercises: true,
     },

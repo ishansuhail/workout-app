@@ -1,6 +1,7 @@
 import { ChatInput } from "@/components/chat-input";
+import { RecentWorkouts } from "@/components/recent-workouts";
 import { currentUser } from "@clerk/nextjs/server";
-import { Dumbbell, TrendingUp, Calendar, Award } from "lucide-react";
+import { Dumbbell, TrendingUp, Calendar } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -73,20 +74,8 @@ export default async function DashboardPage() {
         <div className="mt-4">
             <ChatInput />
         </div>
-        
 
-        <div className="mt-8 rounded-lg bg-white p-8 shadow-sm dark:bg-zinc-800">
-          <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">
-            Recent Workouts
-          </h2>
-          <div className="flex flex-col items-center justify-center py-12">
-            <Dumbbell className="mb-4 h-16 w-16 text-zinc-300 dark:text-zinc-600" />
-            <p className="text-zinc-600 dark:text-zinc-400">
-              No workouts yet. Start your fitness journey today!
-            </p>
-          </div>
-        </div>
-
+        <RecentWorkouts numberOfWorkouts={3} />
         
       </div>
     </div>
