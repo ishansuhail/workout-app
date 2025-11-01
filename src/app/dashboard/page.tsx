@@ -1,5 +1,8 @@
 import { ChatInput } from "@/components/chat-input";
 import { RecentWorkouts } from "@/components/recent-workouts";
+import { TotalWorkouts } from "@/components/total-workouts";
+import { WorkoutStreak } from "@/components/workout-streak";
+import { WorkoutsThisWeek } from "@/components/workouts-this-week";
 import { currentUser } from "@clerk/nextjs/server";
 import { Dumbbell, TrendingUp, Calendar } from "lucide-react";
 import Link from "next/link";
@@ -28,47 +31,13 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Total Workouts
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-white">
-                  0
-                </p>
-              </div>
-              <Dumbbell className="h-10 w-10 text-[#6c47ff]" />
-            </div>
-          </div>
+          
+          <TotalWorkouts />
 
-          <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Current Streak
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-white">
-                  0 days
-                </p>
-              </div>
-              <TrendingUp className="h-10 w-10 text-green-500" />
-            </div>
-          </div>
+          <WorkoutStreak />
 
-          <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  This Week
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-white">
-                  0
-                </p>
-              </div>
-              <Calendar className="h-10 w-10 text-blue-500" />
-            </div>
-          </div>
+          <WorkoutsThisWeek />
+          
         </div>
 
         <div className="mt-4">
@@ -76,7 +45,7 @@ export default async function DashboardPage() {
         </div>
 
         <RecentWorkouts numberOfWorkouts={3} />
-        
+
       </div>
     </div>
   );

@@ -144,6 +144,59 @@ export async function getWorkoutStats(userId: string) {
   };
 }
 
+// Calculate current workout streak (consecutive days with workouts)
+export async function getWorkoutStreak(userId: string) {
+  const allWorkouts = await getWorkoutsByUserId(userId);
+  
+  if (allWorkouts.length === 0) {
+    return 0;
+  }
+
+  // Get unique workout dates (normalize to start of day)
+  const workoutDates = allWorkouts
+    .map(w => {
+      const date = new Date(w.date);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    })
+    .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
+    .sort((a, b) => b - a); // Sort descending (most recent first)
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayTime = today.getTime();
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayTime = yesterday.getTime();
+
+  // Check if the most recent workout was today or yesterday
+  const mostRecentWorkout = workoutDates[0];
+  if (mostRecentWorkout !== todayTime && mostRecentWorkout !== yesterdayTime) {
+    // Streak is broken (no workout today or yesterday)
+    return 0;
+  }
+
+  // Count consecutive days
+  let streak = 0;
+  let currentDate = new Date(mostRecentWorkout);
+  
+  for (const workoutTime of workoutDates) {
+    const expectedTime = currentDate.getTime();
+    
+    if (workoutTime === expectedTime) {
+      streak++;
+      // Move to previous day
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      // Gap found, streak ends
+      break;
+    }
+  }
+
+  return streak;
+}
+
 // Get unique exercise names for a user
 export async function getUniqueExercises(userId: string) {
   const allExercises = await getAllExercisesByUserId(userId);
