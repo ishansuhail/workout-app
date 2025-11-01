@@ -2,6 +2,8 @@ import { getWorkoutsByUserId, getUserByClerkId } from "@/db/queries";
 import { currentUser } from "@clerk/nextjs/server";
 import { Dumbbell } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Item, ItemActions, ItemTitle, ItemContent, ItemDescription } from "./ui/item";
+import { Button } from "./ui/button";
 
 export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: number}) {
     const clerkUser = await currentUser();
@@ -40,9 +42,18 @@ export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: nu
         Recent Workouts
       </h2>
       {workouts.map((workout) => (
-        <div key={workout.id}>
-          <h3>{workout.title}</h3>
-          <p>{workout.date.toLocaleDateString()}</p>
+        <div key={workout.id} className="mt-4">
+          <Item variant="outline">
+            <ItemContent>
+              <ItemTitle>{workout.title}</ItemTitle>
+              <ItemDescription>{workout.date.toLocaleDateString()}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Button variant="outline" size="sm">
+                    Open
+                </Button>
+            </ItemActions>
+          </Item>
         </div>
       ))}
     </div>
