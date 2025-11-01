@@ -2,11 +2,9 @@ import { getWorkoutsByUserId, getUserByClerkId } from "@/db/queries";
 import { currentUser } from "@clerk/nextjs/server";
 import { Dumbbell } from "lucide-react";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Item, ItemActions, ItemTitle, ItemContent, ItemDescription } from "./ui/item";
-import { Button } from "./ui/button";
+import { RecentWorkoutsList } from "./client/recent-workouts-list";
 
-export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: number}) {
+export async function RecentWorkouts({ numberOfWorkouts = 10 }: { numberOfWorkouts?: number } = {}) {
     const clerkUser = await currentUser();
 
     if (!clerkUser) {
@@ -21,7 +19,10 @@ export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: nu
         redirect("/auth/sign-in");
     }
 
-    const workouts = await getWorkoutsByUserId(dbUser.id, numberOfWorkouts);
+    // Fetch one extra to check if there are more
+    const workouts = await getWorkoutsByUserId(dbUser.id, numberOfWorkouts + 1);
+    const hasMore = workouts.length > numberOfWorkouts;
+    const displayWorkouts = hasMore ? workouts.slice(0, numberOfWorkouts) : workouts;
     if (workouts.length === 0) {
         return (
             <div className="mt-8 rounded-lg bg-white p-8 shadow-sm dark:bg-zinc-800">
@@ -42,23 +43,12 @@ export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: nu
       <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">
         Recent Workouts
       </h2>
-      {workouts.map((workout) => (
-        <div key={workout.id} className="mt-4">
-          <Item variant="outline">
-            <ItemContent>
-              <ItemTitle>{workout.title}</ItemTitle>
-              <ItemDescription>{workout.date.toLocaleDateString()}</ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Link href={`/workouts/${workout.id}`}>
-                <Button variant="outline" size="sm">
-                  Open
-                </Button>
-              </Link>
-            </ItemActions>
-          </Item>
-        </div>
-      ))}
+      <RecentWorkoutsList 
+        initialWorkouts={displayWorkouts}
+        userId={dbUser.id}
+        hasMore={hasMore}
+        initialLimit={numberOfWorkouts}
+      />
     </div>
   );
 }
