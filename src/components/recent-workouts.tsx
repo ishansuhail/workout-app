@@ -2,6 +2,7 @@ import { getWorkoutsByUserId, getUserByClerkId } from "@/db/queries";
 import { currentUser } from "@clerk/nextjs/server";
 import { Dumbbell } from "lucide-react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Item, ItemActions, ItemTitle, ItemContent, ItemDescription } from "./ui/item";
 import { Button } from "./ui/button";
 
@@ -49,9 +50,11 @@ export async function RecentWorkouts({ numberOfWorkouts }: {numberOfWorkouts: nu
               <ItemDescription>{workout.date.toLocaleDateString()}</ItemDescription>
             </ItemContent>
             <ItemActions>
+              <Link href={`/workouts/${workout.id}`}>
                 <Button variant="outline" size="sm">
-                    Open
+                  Open
                 </Button>
+              </Link>
             </ItemActions>
           </Item>
         </div>

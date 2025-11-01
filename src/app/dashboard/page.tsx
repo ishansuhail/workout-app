@@ -4,7 +4,6 @@ import { TotalWorkouts } from "@/components/total-workouts";
 import { WorkoutStreak } from "@/components/workout-streak";
 import { WorkoutsThisWeek } from "@/components/workouts-this-week";
 import { currentUser } from "@clerk/nextjs/server";
-import { Dumbbell, TrendingUp, Calendar } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
