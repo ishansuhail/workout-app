@@ -103,7 +103,7 @@ export function ChatInput() {
   return (
     <div className="grid w-full gap-2">
       <Textarea
-        placeholder="Type your message here. (Cmd/Ctrl + Enter to send)"
+        placeholder="Type your workout entry here. Example: 4 by 10 bench 185 (Cmd/Ctrl + Enter to send)"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}

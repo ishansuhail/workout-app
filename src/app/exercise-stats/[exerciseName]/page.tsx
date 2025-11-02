@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ExerciseProgressChart } from "@/components/client/exercise-progress-chart";
 import { ArrowLeft, TrendingUp, Award, Calendar, Dumbbell } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -146,8 +147,11 @@ export default async function ExerciseStatsPage({
               </Card>
             </div>
 
+            {/* Progress Chart */}
+            <ExerciseProgressChart history={history} exerciseName={exerciseName} />
+
             {/* Personal Records */}
-            <Card className="mb-6">
+            <Card className="mb-6 mt-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="h-5 w-5" />
